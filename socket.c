@@ -1,10 +1,10 @@
 /*
-* utilities.c
+* socket.c
 * ROCHEZ Arnaud et PIRARD Delanoe
 *
 */
 
-#include socket.h
+#include "socket.h"
 
 int createSocket() {
 	printf("Creation du socket...\n");
