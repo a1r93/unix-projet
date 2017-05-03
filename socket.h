@@ -21,11 +21,11 @@
 */
 int createSocket();
 
-sockaddr_in createSockaddr();
+struct sockaddr_in createSockaddr();
 
-void bindSocketServer(int* sck, sockaddr_in* addr);
+void bindSocketServer(int sck, struct sockaddr_in addr, int port);
 
-void connectSocketPlayer(int* sck, sockaddr_in* addr, char* host, char* port);
+void connectSocketPlayer(int sck, struct sockaddr_in addr, struct hostent* host, int port);
 
 
 

@@ -20,11 +20,23 @@
 
 #define TROP_JOUEURS -1
 #define PARTIE_EN_COURS 0
+#define MAX_PLAYERS 4
 
 typedef struct Message {
 	int typeMsg;
 	char text[256];
 } message;
+
+typedef struct player {
+    char nickname[25];
+    int score;
+    int sck;
+} player;
+
+typedef struct game {
+    player players[MAX_PLAYERS];
+    int nbplayers;
+} game;
 
 void sendMessage(int sck, message* msg);
 int recvMessage(int sck, message* msg);
