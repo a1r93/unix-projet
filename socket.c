@@ -31,11 +31,19 @@ void bindSocketServer(int sck, struct sockaddr_in addr, int port) {
 void connectSocketPlayer(int sck, struct sockaddr_in addr, struct hostent* host, int port) {
 	bzero((char*)&addr,sizeof(struct sockaddr_in));
 	addr.sin_family = AF_INET;
-	bcopy(host->h_addr,(char*)addr.sin_addr.s_addr,host->h_length);
+	bcopy(host->h_addr,(char*)&addr.sin_addr.s_addr,host->h_length);
 	addr.sin_port = htons(port);
 	
 	if( connect(sck, (struct sockaddr *)&addr, sizeof(addr)) < 0 ) {
 		perror("Erreur lors de la connexion au socket\n");
 		exit(1);
 	}
+}
+
+int acceptSocketPlayer(int sck) {
+	struct sockaddr_in addr2;
+    u_int len2 = sizeof(addr2);
+    int ret = accept(sck, (struct sockaddr *) &addr2, &len2);
+
+    return ret;
 }

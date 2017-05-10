@@ -7,7 +7,7 @@
 #include "utilities.h" 
 
 void sendMessage(int sck, message *msg){
-	printf("Envoi de message au serveur...\n");
+	printf("Envoi de message... : %s\n", msg->text);
 	if(send(sck, msg, sizeof(message),0)<0){
 		perror("Erreur d'envoi du message.");
 		exit(errno);
@@ -15,7 +15,7 @@ void sendMessage(int sck, message *msg){
 }
 
 int recvMessage(int sck, message *msg){
-	printf("Reception de message de client...\n");
+	printf("Reception de message... : %s\n", msg->text);
 	int ret = recv(sck, msg, sizeof(message), 0);
 	if(ret < 0){
 		perror("Erreur de reception du message.");

@@ -27,6 +27,6 @@ void bindSocketServer(int sck, struct sockaddr_in addr, int port);
 
 void connectSocketPlayer(int sck, struct sockaddr_in addr, struct hostent* host, int port);
 
-
+int acceptSocketPlayer(int sck);
 
 #endif
