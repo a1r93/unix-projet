@@ -49,7 +49,7 @@ void * destroyShm() {
 	}
 }
 
-void * detachShm(tablejeu * shm) {
+void * detachShm(game * shm) {
 	if((shmdt(shm)) < 0) {
 		perror("Error: shared memory not detach\n");
 		exit(1);
@@ -95,7 +95,7 @@ void * destroyRc() {
 
 void * detachRc(int * shm) {
 	if((shmdt(shm)) < 0) {
-		"Error: shared memory not detach\n"
+		perror("Error: shared memory not detach\n");
 		exit(1);
 	}
 }

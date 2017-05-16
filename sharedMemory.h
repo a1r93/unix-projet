@@ -5,7 +5,7 @@
 *
 */
 
-#ifndef _SHAREDMEMORY_H_
+#if !defined(_SHAREDMEMORY_H_)
 #define _SHAREDMEMORY_H_
 
 #include "utilities.h"

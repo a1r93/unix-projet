@@ -6,19 +6,22 @@
 
 #include "server.h"
 
-int main(int argc, char const *argv[]) {
-    FILE *fdReader;
-    message msg;
-    int port, sck;
-    struct sockaddr_in addr;
-    fd_set fdset;
-    int gameStarted = 0;
+FILE *fdReader;
+message msg;
+int port, sck, status;
+struct sockaddr_in addr;
+fd_set fdset;
+int gameStarted = 0;
 
+game* gameServ;
+
+int nbmanches = 0;
+int actualmanche = 0;
+
+int main(int argc, char const *argv[]) {
     static struct timeval tv;
     tv.tv_sec = 30;
     tv.tv_usec = 0;
-
-    game* gameServ;
 
     int fdp[2];
     char output[257];
@@ -106,13 +109,13 @@ int main(int argc, char const *argv[]) {
 
                         if (msg.typeMsg == CONNECTION) {
                             if (gameServ->nbplayers < MAX_PLAYERS) {
-                                subcribePlayer(msgRecv.text, sck2, gameServ);
+                                subcribePlayer(msg.text, sck2, gameServ);
                                 msg.typeMsg = CONNECTION;
                                 strcpy(msg.text, "OK");
                                 sendMessage(sck2, &msg);
                                 //int ret2 = close(sck2);
                         
-                                if(gameServ.nbplayers == 1) {
+                                if(gameServ->nbplayers == 1) {
                                     tv.tv_sec = 30;
                                     tv.tv_usec = 0;
                                 }
@@ -156,7 +159,17 @@ int main(int argc, char const *argv[]) {
 
                 if(gameServ->nbplayers > 1) {
                     gameStarted = 1;
-                    perror("Game started\n");
+                    msg.typeMsg = GAMESTART;
+                    strcpy(msg.text, "Game started");
+                    for(i = 0; i < gameServ->nbplayers; i++) {
+                        sendMessage(gameServ->players[i].sck, &msg);
+                    }
+
+                    for (i = 0; i < 3; i++) {
+                        startManche();
+                    }
+                    // regarde les points et annonce le vainqueur
+                    // exit total de tout 
                 } else {
                     tv.tv_sec = 30;
                     tv.tv_usec = 0;
@@ -178,10 +191,68 @@ int subcribePlayer(char* nickname, int sck, game* game) {
     game->nbplayers++;
 }
 
+void startManche() {
+    // reinitialiser takencards
+    actualmanche++;
+    fprintf(stderr, "Manche numéro %d\n", actualmanche);
+
+    int nbCards, i, j;
+    card* cards = getCards(&nbCards);
+    int currentCard = 0;
+
+    for (i = 0; i < nbCards/gameServ->nbplayers; i++) {
+        for (j = 0; j < gameServ->nbplayers; j++) { 
+            gameServ->players[j].cards[gameServ->players[j].nbcards] = cards[currentCard];
+            currentCard++;
+            gameServ->players[j].nbcards++;
+        }
+    }
+
+    msg.typeMsg = GAME;
+    strcpy(msg.text, "The cards have been distributed");
+    for(i = 0; i < gameServ->nbplayers; i++) {
+        sendMessage(gameServ->players[i].sck, &msg);
+    }
+    // Attendre les messages des joueurs pour confirmer que les 5 cartes ont bien été envoyées
+    distributeCards(nbCards);
+
+    // Demander aux joueurs de compter leurs cartes
+    // scores a jour dans memoire partagée
+}
+
+void distributeCards(int nbCards) {
+    // Choper les 5 cartes des joueurs
+    // les donner à leurs voisin de gauche (Faudrait pas une liste chainée pour ça?)
+
+    // while (nbCards > 0) {
+    //     startTour(&nbCards);
+    // }
+}
+
+void startTour(int* nbCards) {
+    int i;
+    msg.typeMsg = CHOOSE_CARD;
+    strcpy(msg.text, "Choose a card to send please");
+    for(i = 0; i < gameServ->nbplayers; i++) {
+        sendMessage(gameServ->players[i].sck, &msg);
+
+        // Attendre pour la réponse du joueur courant
+        // mettre la carte dans la mémoire partagée
+        
+        msg.typeMsg = PLI;
+        strcpy(msg.text, "The 'pli' can be consulted");
+        sendMessage(gameServ->players[i+1].sck, &msg);
+
+        // Coté player il regarde le pli via la mémoire partagée
+    }
+
+    // le joueur avec le plus grand chiffre reçoit toutes les cartes dans takencards
+}
+
 void int_handler(int unused) {  
 	fprintf(stderr,"Lost connection\n");
 	close(sck);
-	detachShm(table);
+	detachShm(gameServ);
 	destroyShm();
   	exit(1);
 }

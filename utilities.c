@@ -24,3 +24,21 @@ int recvMessage(int sck, message *msg){
 	}
 	return ret;
 }
+
+card* getCards(int *nbCards) {
+	card* cards;
+	int i, j;
+	*nbCards = 0;
+
+	for (i = 0; i < NB_CARDS/NB_COLORS; i++) {
+		for (j = 0; j < NB_COLORS; j++) {
+			card newCard;
+			newCard.color = j;
+			newCard.value = i;
+			cards[*nbCards] = newCard;
+			nbCards++;
+		}
+	}
+
+	return cards;
+}

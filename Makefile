@@ -1,19 +1,22 @@
-all: server.exe player.exe
+all: server player
 
-player.exe: player.o socket.o utilities.o
-	gcc -o player.exe player.o socket.o utilities.o
+player: player.o socket.o utilities.o sharedMemory.o
+	cc -o player player.o socket.o utilities.o sharedMemory.o
 
 player.o: player.c socket.h utilities.h
-	gcc -c player.c
+	cc -c player.c
 
-server.exe: server.o socket.o utilities.o
-	gcc -o server.exe server.o socket.o utilities.o
+server: server.o socket.o utilities.o sharedMemory.o
+	cc -o server server.o socket.o utilities.o sharedMemory.o
 
-server.o: server.c socket.h utilities.h
-	gcc -c server.c
+server.o: server.c socket.h utilities.h sharedMemory.h
+	cc -c server.c
+
+sharedMemory.o: sharedMemory.c sharedMemory.h utilities.h
+	cc -c sharedMemory.c 
 
 socket.o: socket.c socket.h utilities.h
-	gcc -c socket.c
+	cc -c socket.c
 
 utilities.o: utilities.c utilities.h
-	gcc -c utilities.c 
+	cc -c utilities.c 

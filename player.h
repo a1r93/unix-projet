@@ -9,6 +9,7 @@
 
 #include "socket.h"
 #include "utilities.h"
+#include "sharedMemory.h"
 
 #include <signal.h>
 

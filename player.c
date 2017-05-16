@@ -6,14 +6,14 @@
 
 #include "player.h"
 
-int main(int argc, char const *argv[]) {
-    message msgRecv, msgSend;
-    int port, sck;
-    struct sockaddr_in addr;
-    struct hostent* host;
+message msgRecv, msgSend;
+int port, sck;
+struct sockaddr_in addr;
+struct hostent* host;
 
-    signal(SIGPIPE, err_handler);
-    signal(SIGINT, int_handler);
+int main(int argc, char const *argv[]) {
+    // signal(SIGPIPE, err_handler);
+    // signal(SIGINT, int_handler);
 
     if (argc != 3) {
         fprintf(stderr, "Usage: %s host port\n", argv[0]);
@@ -62,9 +62,19 @@ int main(int argc, char const *argv[]) {
         }
 
         if (msgRecv.typeMsg == TEST) {
-            msgSend.typeMsg = TEST
+            msgSend.typeMsg = TEST;
             strcpy(msgSend.text, "test");
             sendMessage(sck, &msgSend);
+        }
+
+        // The game started
+        if (msgRecv.typeMsg == GAME) {
+            fprintf(stdout, "Vous pouvez voir vos cartes, voulez-vous les voir? (O/N)\n");
+            fgets(ibuf, BUFSIZE, stdin);
+            if (strcmp(ibuf, "O")) {
+                // printCards(this???);
+                // Je pense qu'il faut accéder à la shared memory ici pour choper les cartes du joueur
+            }
         }
     }
 }
