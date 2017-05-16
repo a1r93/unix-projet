@@ -12,4 +12,7 @@
 
 #include <signal.h>
 
+void err_handler(int unused);
+void int_handler(int unused);
+
 #endif

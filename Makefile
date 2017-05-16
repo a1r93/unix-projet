@@ -1,19 +1,19 @@
-all: server player
+all: server.exe player.exe
 
-player: player.o socket.o utilities.o
-	cc -o player player.o socket.o utilities.o
+player.exe: player.o socket.o utilities.o
+	gcc -o player.exe player.o socket.o utilities.o
 
 player.o: player.c socket.h utilities.h
-	cc -c player.c
+	gcc -c player.c
 
-server: server.o socket.o utilities.o
-	cc -o  server server.o socket.o utilities.o
+server.exe: server.o socket.o utilities.o
+	gcc -o server.exe server.o socket.o utilities.o
 
 server.o: server.c socket.h utilities.h
-	cc -c server.c
+	gcc -c server.c
 
 socket.o: socket.c socket.h utilities.h
-	cc -c socket.c
+	gcc -c socket.c
 
 utilities.o: utilities.c utilities.h
-	cc -c utilities.c 
+	gcc -c utilities.c 

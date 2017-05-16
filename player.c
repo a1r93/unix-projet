@@ -7,10 +7,13 @@
 #include "player.h"
 
 int main(int argc, char const *argv[]) {
-    message msg;
+    message msgRecv, msgSend;
     int port, sck;
     struct sockaddr_in addr;
     struct hostent* host;
+
+    signal(SIGPIPE, err_handler);
+    signal(SIGINT, int_handler);
 
     if (argc != 3) {
         fprintf(stderr, "Usage: %s host port\n", argv[0]);
@@ -38,12 +41,12 @@ int main(int argc, char const *argv[]) {
         fgets(ibuf, BUFSIZE, stdin);
     }
     
-    msg.typeMsg = CONNECTION;
-    strcpy(msg.text, ibuf);
-    sendMessage(sck, &msg);
-    recvMessage(sck, &msg);
+    msgSend.typeMsg = CONNECTION;
+    strcpy(msgSend.text, ibuf);
+    sendMessage(sck, &msgSend);
+    recvMessage(sck, &msgRecv);
 
-    if (msg.typeMsg == CONNECTION && strcmp(msg.text, "OK") == 0) {
+    if (msgRecv.typeMsg == CONNECTION && strcmp(msgRecv.text, "OK") == 0) {
         fprintf(stdout, "Vous êtes bien inscrit à la partie\n");
     } else {
         fprintf(stderr, "Erreur: nombre de joueurs max à été atteint\n");
@@ -52,14 +55,28 @@ int main(int argc, char const *argv[]) {
     }
 
     while(1) {
-        // if (recvMessage(sck, &msg) <= 0) {
-        //     perror("La connection avec le serveur à été perdue");
-        //     close(sck);
-        //     exit(-1);
-        // }
+        if (recvMessage(sck, &msgRecv) <= 0) {
+            perror("La connection avec le serveur à été perdue");
+            close(sck);
+            exit(-1);
+        }
 
-        if (msg.typeMsg == TEST) {
-            sendMessage(sck, &msg);
+        if (msgRecv.typeMsg == TEST) {
+            msgSend.typeMsg = TEST
+            strcpy(msgSend.text, "test");
+            sendMessage(sck, &msgSend);
         }
     }
+}
+
+void err_handler(int unused){   
+ 	fprintf(stderr,"Connection lost!\n");
+  	close(sck);
+  	exit(1);
+}
+
+void int_handler(int unused) {
+	fprintf(stderr,"Connection lost!\n");
+	close(sck);
+  	exit(1);
 }

@@ -15,5 +15,6 @@
 #include <netinet/in.h>
 
 int subcribePlayer(char* nickname, int sck, game* game);
+void int_handler(int unused);
 
 #endif
